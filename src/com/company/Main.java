@@ -25,7 +25,7 @@ public class Main {
         }
         long end = System.currentTimeMillis();
         long time = end - start;
-        System.out.println("Время работы первого метода: " + time);
+        System.out.println("Время работы первого метода: " + time+" ms");
     }
 
     void twoThread(float arr[]) {
@@ -38,25 +38,34 @@ public class Main {
         System.arraycopy(arr, 0, arr1, 0, h);
         System.arraycopy(arr, h, arr2, 0, h);
         long onTwo=System.currentTimeMillis();
-        new Thread(() -> {
+        Thread thread1=new Thread(() -> {
             for (int i = 0; i < arr1.length; i++) {
                 arr[i] = (float) (arr[i] * Math.sin(0.2f + i / 5) * Math.cos(0.2f + i / 5) * Math.cos(0.4f + i / 2));
             }
-        }).start();
+        });
         long onTwo2=System.currentTimeMillis();
-        new Thread(() -> {
+        Thread thread2=new Thread(() -> {
             for (int i = 0; i < arr2.length; i++) {
-                arr[i] = (float) (arr[i + arr2.length] * Math.sin(0.2f + i / 5) * Math.cos(0.2f + i / 5) * Math.cos(0.4f + i / 2));
+                arr[i] = (float) (arr[i + arr2.length] * Math.sin(0.2f + (i+h) / 5) * Math.cos(0.2f + (i+h) / 5) * Math.cos(0.4f + (i+h) / 2));
             }
-        }).start();
+        });
+        thread1.start();
+        thread2.start();
+        try {
+            thread1.join();
+            thread2.join();
+        } catch (InterruptedException e){
+            e.printStackTrace();
+        }
+
         long onTwoEnd=System.currentTimeMillis();
         System.arraycopy(arr1, 0, arr, 0, h);
         System.arraycopy(arr2, 0, arr, h, h);
         Long clue=System.currentTimeMillis();
-        System.out.println("Время для разбивки массивов: "+(onTwo-start));
-        System.out.println("Время просчета первого массива arr1: "+(onTwo2-onTwo));
-        System.out.println("Время просчета второго массива arr2: "+(onTwoEnd-onTwo2));
-        System.out.println("Время склейки массивов: "+(clue-onTwoEnd));
+        System.out.println("Время для разбивки массивов: "+(onTwo-start)+" ms");
+        System.out.println("Время просчета первого массива arr1: "+(onTwo2-onTwo)+" ms");
+        System.out.println("Время просчета второго массива arr2: "+(onTwoEnd-onTwo2)+" ms");
+        System.out.println("Время склейки массивов: "+(clue-onTwoEnd)+" ms");
     }
 }
 
